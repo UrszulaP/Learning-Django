@@ -1,6 +1,7 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
+from django.utils import timezone
 from django.views import generic
 
 from .models import Choice, Question
@@ -13,7 +14,9 @@ class IndexView(generic.ListView):
     def get_queryset(self):
         """Return the last five published questions
         Method overriding default context - list of all model objects (should then be set: model = Question)"""
-        return Question.objects.order_by('-pub_date')[:5]  # "-" means reverse order, returns a list
+        return Question.objects.filter(
+            pub_date__lte=timezone.now()  # lte means less than or equal to
+        ).order_by('-pub_date')[:5]  # "-" means reverse order, returns a list
 
 
 class DetailView(generic.DetailView):
