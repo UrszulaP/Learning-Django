@@ -11,7 +11,7 @@ class IndexView(generic.ListView):
     template_name = 'polls/index.html'  # default: <app name>/<model name>_<view type>.html -> polls/question_list.html
     context_object_name = 'latest_question_list'  # context variable name, default: question_list (question for DetailView)
 
-    def get_queryset(self):
+    def get_queryset(self):  # overrides default method
         """Return the last five published questions
         Method overriding default context - list of all model objects (should then be set: model = Question)"""
         return Question.objects.filter(
@@ -22,6 +22,12 @@ class IndexView(generic.ListView):
 class DetailView(generic.DetailView):
     model = Question
     template_name = 'polls/detail.html'
+
+    def get_queryset(self):
+        """
+        Excludes any questions that aren't published yet.
+        """
+        return Question.objects.filter(pub_date__lte=timezone.now())
 
 
 class ResultsView(generic.DetailView):
